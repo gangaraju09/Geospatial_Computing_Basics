@@ -1,0 +1,113 @@
+Task 1. 
+
+(A).  Real-world ground dimensions width by height of corona.tif is:
+                   width  = 807203.562 - 798243.562 = 8960 m  (m = meters)
+                   height = 1701946.684 - 1694777.684 = 7170 m
+         dimension information was aquired from corona.tif using osgeo4w shell
+         
+            Corner Coordinates:
+Upper Left  (  798243.562, 1701947.684) 
+Lower Left  (  798243.562, 1694777.684) 
+Upper Right (  807203.562, 1701947.684) 
+Lower Right (  807203.562, 1694777.684) 
+Center      (  802723.562, 1698362.684) 
+
+PROJCRS["WGS 84 / UTM zone 48N",
+ PARAMETER["False easting",500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",0,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+
+   
+
+    (B).  pixel size = 1792 * 1434 = 2569728 px^2
+          Area       = 8960 * 7140 = 64,243,200 m^2
+          
+          Hence 1 px^2 = 25 m^2
+                1 px = 5 m
+                100 px per cm = 5 * 100 *100  (m = 100cm)(cm = centimeters)
+          therefore Propotional scale of printed photo at a resolution of 100 pixels per cm (cemtimeter) is 1:50000
+
+
+
+Task 2. 
+
+(A)
+
+A:\GISGDAL\g378lab5data> gdalinfo independence.dem > output.txt
+
+with > output-filename.txt we could write entire output of independence.dem using gdalinfo independence.dem 
+
+
+
+(B)  
+
+A:\GISGDAL\g378lab5data>gdalwarp -t_srs "+proj=longlat +ellps=GRS80 +datum=NAD83" independence.dem id.dem
+
+A:\GISGDAL\g378lab5data>gdalwarp -t_srs "+proj=utm +zone=10" id.dem independence-NAD83.dem
+
+with the above gdalwarp steps the file independence.dem with NAD27 datum will reproject to NAD83 Datum
+
+Task 3 
+
+(A) 
+
+A:\GISGDAL\g378lab5data>gdaldem hillshade -s 2 independence-NAD83.dem independence.tif
+
+(-s 2)= Ratio of vertical units to horizontal. If the horizontal unit of the source DEM is degrees (e.g Lat/Long WGS84 projection), we can use scale=111120 if the vertical units are meters (or scale=370400 if they are in feet)
+
+(B) 
+
+A:\GISGDAL\g378lab5data>gdal_contour independence-NAD83.dem contour-10m.shp -i 10.0
+
+gdal_contour generates vector contour file from independence-NAD83.dem with 10 meter countour interval
+
+Task 4
+
+(A) 
+
+ real-world ground dimensions of the bldg_clip_dist shapefile is  (790923.270307, 869950.682382) - (825239.799771, 905872.155487)
+
+its units are us foot
+
+command = A:\GISGDAL\g378lab5data>ogrinfo -so bldg_clip_dist.shp bldg_clip_dist
+
+(B)
+
+This information is not sufficient to calculate dimensions and to determine exact area on earth covered by the features in shapefile, this could be possible only by adding all the polygon area covered on earth 
+
+Task 5
+
+ COUNT_LU (Integer) = 41, 41 different land use categories are represented in lulc_clip_dist shapefile
+
+command : A:\GISGDAL\g378lab5data>ogrinfo -sql "select COUNT(DISTINCT LU) from lulc_clip_dist" lulc_clip_dist.shp
+
+Task 6
+
+@echo off
+echo input shapefile name: %1.shp
+ogr2ogr -f "KML" %1.kml %1.shp
+echo output file name %1.kml
+
+now we can write shapefiles into KNL files with Above shp2Kml.bat file
+
+A:\GISGDAL\g378lab5data>shp2kml lulc_clip_dist
+
+output will be : input shapefile name: lulc_clip_dist.shp
+                 output file name lulc_clip_dist.kml
+
+There will be new kml with name as lulc_clip_dist.kml file in the folder
+
+
+
+
+
